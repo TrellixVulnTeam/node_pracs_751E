@@ -19,6 +19,7 @@ http.createServer((req, res) => {
     console.log("server open port 8000");
     res.writeHead(200, { "Content-Type": "text/plain" });
     writeNums(res);
+    res.write(req.url);
     setTimeout(() => {
         console.log(`opening ${fileName}`);
         fs.readFile(path.join(__dirname, "../","static/",fileName), { encoding: "utf8" }, (err, data) => {
