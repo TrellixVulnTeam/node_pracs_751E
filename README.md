@@ -30,4 +30,49 @@
                 -favicon.ico에 대한 요청이 거절 되더라도, 브라우저의 임의적인 백그라운드 작업이라 해당 오류에서 큰 문제가 안 생기도록 브라우저에서 처리가 되어있으나, 주류 브라우저 공통으로 진행되는 작업
                 -브라우저에 따라서 조금씩 차이가 있을 수 있다는 점을 체크 
             -favicon.ico에 대한 요청은 res와는 무관하게(문서와) 진행된다.
-                    
+
+    2.p38_TCPsocket_${arg}
+        A.${arg} === server
+            1.net module imports...
+            2.class TCPServer
+                -public this.app: net.Server(TCP서버 앱)
+                -public this.clientSockets:net.Sockets[] =[]
+                -private socketConfig(clientSocket:net.Socket){
+                    1.접속한 클라이언트에 대해서 this.clientSockets에 주소값 저장하여 관리.
+                    2.새로이 메서드 실행시 접속중인 클라이언트 숫자를 clientSockets.length를 통해서 가져와 서버측 로그에 찍어줌
+                    3.해당 클라이언트 소켓에 고유이벤트"data"에 대한 event-listener지정:
+                        -클라이언트소켓이 "data"이벤트가 발생하면 해당 클라이언트를 제외한 클라이언트[]를 순회하여 otherClientSockets.write()로 data를 찍어줌.
+                        -만약 스스로 quit라는 단어를 적었다면, 해당clientSocket.end()로 소멸.
+                    4.해당 클라이언트 소켓에 고유이벤트"close"에 대한 listeningEvent연결:
+                        -서버앱.clientSockets[]의 해당소켓 index 조회하여 clientSockets.splice(index, 1)로 pop시킴.
+                }
+                -private serverConfigs(){
+                    this.app에 대한 이벤트리스너 연결
+                        -고유이벤트
+                            1."connetion" -> (socket)=>this.socketConfigs(socket)
+                            -클라이언트 소켓 접속시 콜백에 해당 소켓 받고 socketConfigs로 클라이언트 소켓에 대한 이벤트작업.
+                            2."error" -> (err) => console.log(err.message)
+                            3.close ->()=>서버종료 콘솔로깅.
+                }
+            3.const singleServer = TCPServer.bootstrap();
+            4.singleServer.app.listen(포트,()=>콘솔로깅) 
+        B.${arg} === client
+            1.imports net...
+            2.process.stdin.resume();
+                -인풋활성화(콘솔을 통해 input을 받음)
+            3.const client = net.connect({
+                host:"localhost",port:포트번호
+            },()=>{
+                클라이언트가 서버에 접속 성공시 콘솔로깅(클라이언트측)
+            })
+            4.client에 대한(연결 훅) 고유 이벤트
+                -"data",(message)=>{
+                    1.서버측에서 클라이언트소켓에서 input을 전달받아 
+                    2.otherClientSockets에게 .write()로 data이벤트 발생시킴
+                    3.다른클라이언트에게서 ${message}를 받은거을 콘솔로깅}
+                -"end",()=>{
+                    자신이 명령어에 의한 end이벤트통해 종료됨을 콘솔로깅
+                }
+                -"close",()=>{
+                    자신이 스스로 닫았음을 콘솔로깅
+                }
