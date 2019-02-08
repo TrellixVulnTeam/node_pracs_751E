@@ -76,3 +76,20 @@
                 -"close",()=>{
                     자신이 스스로 닫았음을 콘솔로깅
                 }
+    
+    3.p53_UNIXsocket_
+        A.server
+            1.http.createServer().listen("localSocketPath");
+                =Unix소켓 통신을 http모듈에서 실행
+                (모든 서버/소켓 모듈은 특정 네트워크포트가 아닌 UNIX소켓에도 연결할 수 있다.)
+            
+            /실행 후 정리
+                -http서버 모듈에 물론 UNIX소켓이 바인딩가능하겠지만,
+                 좀더 최적화된 모듈을 이용하는것이 좋다.
+                 -http문서전송에는 기본적으로 header를 기반으로한 통신절차가 갖춰져 있으나, UNIX(동일시스템간 통신)에서는 필수적이지 않은듯 하다.
+        B.client
+            1.const connections = http.request(options:http.RequestOptions, (response)=>{
+                response에 대한 처리
+            });
+            2.connection.on(소켓연결에 관한 이벤트처리);
+            connection.write(소켓연결을 통한 행동지시);
