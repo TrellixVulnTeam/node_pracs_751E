@@ -106,3 +106,27 @@
         D.추가 요소
             -멀티캐스팅, 클러스터운영 등을 통해 다수의 유저들이 트래픽문제를 줄이면서, 서로 공유할 수 있는 환경을 서버에서 조성해 줄 수 있다.
             유저 자체가 수신자이자 다수를 대상으로 송신자가 되기도 하지만, 서브넷에 대해 하나의 연결설정을 전송하면 해당서브넷이 그 외 클라이언트에대해 클러스터(즉 서버의 성능) 분산을 통해서 예상되는 유저의 수만큼 커버 할 수 있는 화상채팅, 다수의 음성대화등을 구현한다. 
+
+    5.p58_readLine_interface
+        A.구현림
+            1.프로그램(readline.createInterface(사용할 읽을 수 있는 스트림, 사용할 입력할 수 있는 스트림,completer,terminal)) 성립
+            2.성립된 프로그램의 question메서드 실행("question msg", (answer:읽기스트림으로 들어올 데이터)=>{
+                question:data with writeable stream에 대한 answer:data with readable stream에 관한 취급로직. answer를 받았을 때, 실행되는 콜백.
+                -취급과 마지막에 cli.setPrompt(); cli.prompt()로 다시 resume();과 같은 역할로 열어준다.
+            })
+            3.question에 대한 시퀸스는 실행과 함께 강제되었고, 해당 이벤트는 line이라는 이벤트에 해당하지 않았음. 실제로 해당이 되어야 했었는데, 해당 이벤트에 대한 처리가 line이벤트에 대한 콜백보다 우선되어서  실행 되었다고 보는게 맞다.
+            4.cli_interface.on("line",(input)=>{});
+            으로 question이후로 열린 cli에 대해서 들어오는 값을 "line"이라는 이벤트 명을 지니게 하고, 그에 대한 일괄적인 처리.
+            또한 마지막에 .setPrompt(); .prompt();를 통해 readline이라는 단위 처리를 이후 연속된 시퀸스로 연결. 
+        B.정리
+            1.prompt에 readable-stream, writable-stream을 가져와서 readline.createInterface에 연결해주고, 이후 처리를 하는데.
+            2.이것은 기본적인 프롬프트라는 외부요소와, nodejs에 eventEmitter를 활용한 stream처리를 하는 프로그램.
+            3.eventEmitter를 활용하여 확장한 개념이 stream개념.
+            stream을 구현한 것이 process.stdin, process.stdout 출력가능, 입력가능한 스트림.
+            4.readline이라는 개념은 줄단위 스트림이벤트를 처리하기위한 간편한 도구.
+            5.TCP소켓은 클라이언트 소켓 자체가 readable and writeable한 상태이고, 서버는 그 소켓이 writable로 보내온 data를 readable했기에 "data"이벤트처리하고, 연이어 writable하기 때문에, 다른 클라이언트 소켓에 대해서 data를 연결해주는, 
+            socket.writableStream.pipe(readableStream);의 개념을 []를 통해 처리해주는 시스템이었다.
+            TCPserver.on("connection",(socket)=>{});
+            TCP서버를 구현하고 연결이 성립되는 동시에 socket으로서 접속자를 바라본다.
+            client측에서 const client = new net.Socket();
+            자신을 소켓으로 생성하고 이후 그 소켓이 특정 TCP서버에 접속 한다.
