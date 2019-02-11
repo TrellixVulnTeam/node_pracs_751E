@@ -108,7 +108,7 @@
             유저 자체가 수신자이자 다수를 대상으로 송신자가 되기도 하지만, 서브넷에 대해 하나의 연결설정을 전송하면 해당서브넷이 그 외 클라이언트에대해 클러스터(즉 서버의 성능) 분산을 통해서 예상되는 유저의 수만큼 커버 할 수 있는 화상채팅, 다수의 음성대화등을 구현한다. 
 
     5.p58_readLine_interface
-        A.구현림
+        A.구현
             1.프로그램(readline.createInterface(사용할 읽을 수 있는 스트림, 사용할 입력할 수 있는 스트림,completer,terminal)) 성립
             2.성립된 프로그램의 question메서드 실행("question msg", (answer:읽기스트림으로 들어올 데이터)=>{
                 question:data with writeable stream에 대한 answer:data with readable stream에 관한 취급로직. answer를 받았을 때, 실행되는 콜백.
@@ -130,3 +130,24 @@
             TCP서버를 구현하고 연결이 성립되는 동시에 socket으로서 접속자를 바라본다.
             client측에서 const client = new net.Socket();
             자신을 소켓으로 생성하고 이후 그 소켓이 특정 TCP서버에 접속 한다.
+    
+    6.p60_child_process
+        A.목적
+            -운영체제의 프로세스로서 사용할 수 있는 기능을, Nodejs모듈을 통해서 Nodeapp이 운영체제의 기능을 프롬프트를 통하여 사용하도록 하는 것이 child_process모듈의 시작에 있다.
+        B.구현
+            1.child_process.spawn() importation
+            2.pwd = spawn("pwd");
+            3.pwd명령이 포함된 하위 프로세스에 대한 이벤트 처리
+                pwd.stdout.on("data",(data)=>{...});
+                pwd.stderr.on("data",(data)=>{...});
+                pwd.on("exit",(errCode)=>{if(errCode)...});
+        C.정리
+            -child_process에서 새로운 프로세스를 생성하는 방식은 4가지가 있고, 여기서 다루는 것은 .spawn(); 추후에 cluster모듈이 등장하는데, 그것은 싱글쓰레드로 처리하는 nodeapp을 cluster의 worker를 이용하여 다양한 일을 동시에 처리할 수 있도록 하는데 os모듈.cpus().length를 통해서 cpu의 코어수를 확인하고, 그 길이 만큼(서버 컴퓨터가) worker를 생성하여 포트를 할당하고 개별 eventEmitter처리를 해주는 역할. 
+            worker는 cluster.fork()를 사용하여 생성. 
+            cluster.fork는 child_process.fork에 대한 레퍼런스.
+            (cluster.fork를 통해서 생성된 worker는 nodeapp의 메인process와 트리구조를 갖고 그에 따라 UNIXsocket,IPC통신을 진행할 수 있고 같은 시스템, 동일 cpu내의 다른 코어이기 때문에 그것은 비교적 빠르다.)
+            -.spawn()을 활용한 자식프로세스 또한 cpu의 capacity에 연관이 있다.
+            -.fork()는 노드프로세스(운영체제기능을 목적x)
+            -.spawn()은 쉘(노드app을 목적x)
+            -어떤 식으로 이용할 추가 프로세스인지에 따라서 다르게 선택하고 로직을 작성하라.
+            -nodeapp뒤에서 돌아가는 child_process라는 점에서 동일.
