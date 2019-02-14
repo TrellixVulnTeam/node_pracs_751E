@@ -151,3 +151,40 @@
             -.spawn()은 쉘(노드app을 목적x)
             -어떤 식으로 이용할 추가 프로세스인지에 따라서 다르게 선택하고 로직을 작성하라.
             -nodeapp뒤에서 돌아가는 child_process라는 점에서 동일.
+    
+    7.p72_event_emitter
+        A.목적
+            -process.stdin.on("data")라는 Native-readableStream을 고유로 생성한 fs.writeStream에 연결시켜, 특정 커맨드가 입력되었을때, 세션을 종료하거나, 외부파일로 저장하는 것이 목적. 특정 커맨드라는 분기에 대해서 3가지로 분류하여, eventEmitter를 상속받은 class로 생성된 객체에 대해서, e_m의 on,emit 메서드를 활용.
+        B.구현
+            0.import EventEmitter from Events
+                import fs from fs
+            1.class InputChecker extends E_M
+                2.constructor(name:str,file:str){
+                    this.name = name;
+                    this.writeStream = fs.createWriteStream(path,options);
+                }
+                3.inputChecker.prototype.check = (input:any) =>{
+                    input = 프롬프트를 통해 들어온 값
+                    (이미 상속이 완료 되어기 때문에,emit메서드가 발현 가능.)
+                    switch(input){
+                        분기1 wr:
+                        this.emit("write",callback)
+                        분기2 en:
+                        this.emit("end",callback)
+                        default:
+                        this.emit("echo",callback)
+                    }
+                }
+                4.process.stdin.resume();
+                    process.stdin.on("data",(input)=>{
+                        ic.check(input);
+                    });
+        C.정리
+            -기존의 stream은 eventEmitter를 기반으로 만들어진 IO.
+            -IO는 writeable, readable을 대상으로 eventEmitter를 붙인것.
+            -새로운 스트림을 생성하면, 해당 스트림에 eventEmitter를 붙이고, IO를 연결시킨다.
+                1.IO 들어옴
+                2.IO의 data를 스트림으로 연결
+                3.스트림이 받은 데이터를 eventEmitter를 통해 처리
+                4.IO에서 들어온 데이터 처리 완료
+                5.새로운 데이터 입력가능 사이클 형성됨. 
