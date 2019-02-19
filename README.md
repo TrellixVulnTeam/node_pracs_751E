@@ -188,3 +188,38 @@
                 3.스트림이 받은 데이터를 eventEmitter를 통해 처리
                 4.IO에서 들어온 데이터 처리 완료
                 5.새로운 데이터 입력가능 사이클 형성됨. 
+
+    8.p100_callbackAndPromise
+        A.목적
+            콜백함수를 받는 메서드의 경우는 대부분 비동기함수로 분류되고있다. 
+        B.구현
+        C.정리
+            1.초기 Node에서는 비동기 기능이 초기개념의 Promise를 사용하여 만들어졌다. 
+            function oldAsync(filename)
+            {
+                1.const promist = new process.Promise();새로운 Promise객체 생성.
+                // fs.stat(filename) = 비동기함수
+                3.fs.stat(filename).addCallback(func(result){
+                    addcallback 체이닝 이전 결과물의 returned result에 대해서 콜백을 더한다.(일종의 전처리)result가 디렉터리 일 경우:
+                        promise.emitError(error);
+                        return;
+                    -폴쓰루시 디렉터리아님.
+                    fs.readFile(filename).addCallback(
+                        function(data){
+                            promise.emitSuccess(data);
+                        }
+                    ).addErrback(
+                        function(err){
+                            promise.emitError(err);
+                        }
+                    )
+                });
+                return promise;
+            }
+            스텍구조처리
+                6.Promise또한 진행중인 상태로 return 되고, 그에 대한 처리가 완료될때까지 폴스루 발생.
+                5.fs.stat()은 진행중인 상태로 Promise는 반환됨.
+                4..addCallback()으로 이후처리에 대해 Promise에 내장된 eventEmitter로 처리, fs.stat()은 비동기함수로 폴스루 발생
+                3.들어온 매개변수로 fs.stat(name)실행
+                2.local var로 promise 생성
+            1.oldAsync시작
