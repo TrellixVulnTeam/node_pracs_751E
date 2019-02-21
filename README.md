@@ -223,3 +223,30 @@
                 3.들어온 매개변수로 fs.stat(name)실행
                 2.local var로 promise 생성
             1.oldAsync시작
+    
+    9.p107_stats_read_write
+        A.목적
+            Promise 없는 비동기 메서드의 구현
+        B.구현
+            1.전역 writeStream = fs.createwriteStream();으로 writableStream 생성
+            2.Try 구문시작
+                -fs.readdir(targetDir,(err,files)=>{
+                    -files.forEach((name)=>{
+                        -fs.stat(name,(err,stats)=>{
+                            -if(stats.isFile()){//파일일 경우
+                                fs.readFile(name,option,(er,data)=>{
+                                    if(err) throw err;
+                                    data.replace로 데이터에서 특정 키워드를 찾아 수정해 변수(adjData)에 저장
+                                    fs.writeFile(name,adjData,(err)=>{
+                                        -writeStream.write(`name 파일에 대한 adjData를 덮어쓰기 완료시 위의 스트림으로 연결해 놓은 로그 파일에 기록.`);
+                                    })
+                                })
+                            }
+                        })
+                    })
+                })
+        C.정리
+            -비동기 함수는 sync(argA,argB) 라고 되어 있고 콜백에 대한 argument명 지정은 되어있지 않다.
+            -따라서 위의 구문(예를 들어 파일에 쓰기)가 완료되면, 이후 폴스루가 실행되고, 3번째 매개변수인 콜백이 비동기로 실행된다.
+            -기본적으로 callstack에서 진행되는 것과 다르게 비동기콜백은 queue에 저장되어, 먼저 들어온것이 먼저 들어온것이 먼저 실행되지만, 종료되는 시점은 알 수 없기 때문에 오차가 생기는 것에 대해서 알수 있다.
+            -콜백은(err,result)=>{}같은 형식으로 나오는데, err에 대한 처리는 프레임워크들에서는 throw구문이 비정상적이라고 판단하여 사용하지 않고 다른 처리를 만들어 놓았지만, 현 단계에서는 throw err; 로 처리하여 try{}catch{util.inspect(err)}로 어떤 중첩콜백에서 에러가 발생하더라도 catch문으로 전달되도록 처리한다.
