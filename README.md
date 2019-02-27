@@ -250,3 +250,59 @@
             -따라서 위의 구문(예를 들어 파일에 쓰기)가 완료되면, 이후 폴스루가 실행되고, 3번째 매개변수인 콜백이 비동기로 실행된다.
             -기본적으로 callstack에서 진행되는 것과 다르게 비동기콜백은 queue에 저장되어, 먼저 들어온것이 먼저 들어온것이 먼저 실행되지만, 종료되는 시점은 알 수 없기 때문에 오차가 생기는 것에 대해서 알수 있다.
             -콜백은(err,result)=>{}같은 형식으로 나오는데, err에 대한 처리는 프레임워크들에서는 throw구문이 비정상적이라고 판단하여 사용하지 않고 다른 처리를 만들어 놓았지만, 현 단계에서는 throw err; 로 처리하여 try{}catch{util.inspect(err)}로 어떤 중첩콜백에서 에러가 발생하더라도 catch문으로 전달되도록 처리한다.
+    
+    10.p115_3rd_async_waterfall
+        A.목표
+            콜백이 비동기적으로 처리되는 함수들을 순차적으로 처리해주는 메서드를 사용한다.
+            일반적인 사용과 다른점은, waterfall자체가 비동기여서, 폴스루가 일어나고, 그 안에 비동기함수들을 정리해준다는 측면.
+        B.구현
+            readData = (callback)=>{fs.readFile}
+            modify = (text, callback) =>{callback(null, `${text} -2modify`)}
+            writeData = (text, callback) =>{fs.writeFile}
+
+            try{
+                waterfall([
+                    readData,modify,writeData
+                    ],
+                    (err,result)=>{
+                        if(err) throw err;
+                        console.log(result);
+                    }
+                    )
+            }catch(err){
+                console.log(err.message);
+            }
+        C.정리
+            3개의 변수에 할당된 함수는 callback이라는 임의의 함수를 매개변수로 받게 되어있고, 2번쨰 index로 들어오는 modify부터는 그 이전 index에서 callback으로 전달된 값이 text라는 매개변수로 들어오기 때문에, 2개의 매개변수를 지정해 주고 있다. 
+            waterfall(...); 구문은 그 자체로 비동기 함수여서, 실행해놓고 폴스루가 발생하고, 그 내부에 Fucntion[]을 매개변수로 받아서 인덱스 별로 처리하고 인덱스들의 마지막 arguments요소인 callback에 값을 지정해서 인덱스 순으로 순차적으로 종료를 확인하고 값을 다음 인덱스로 전달. 중간에 어디서든 callback(err,data)문에서 err에 할당이 되면, waterfall([],(err,data)=>{if(err)throw err;})문으로 err가 처리되고 catch문으로 이동하여 waterfall이라는 구문이 마무리된다.
+            정상종료시, 마지막 index에서 받은 result를 err가 아닌 result를 콘솔로깅하여 종료한다.
+            
+    11.p118_3rd_async_parallel
+        A.목표           
+            -병렬적 실행과, 개별 요소의 독립성을 유지, 최종적으로만 통합하여 정리해주는 함수 
+        B.구현
+            1.try{}catch(err){
+                에러 로깅
+            }
+            2.try{
+                parallel({
+                    A:(callback)=>{
+                        callback(err,data);
+                    }
+                    B:(callback)=>{
+                        callback(err,data);
+                    }
+                    C:(callback)=>{
+                        callback(err,data);
+                    }
+                },
+                (err,result)=>{
+                    최종 처리 구문    
+                }
+                )
+            }
+            3.parallel이 비동기로 실행되고,
+            ABC가 각각 동시에 실행되고, callback에 err든 data든 최종처리 구문에 도달한 data 순서대로 받아서 처리한다. 
+        C.정리
+            -그 자체가 비동기함수이며, 객체의 형태로 받은 함수들을 병렬적으로 실행시키고, 서로 상관관계 없이 최종값에 도달하는 순서대로 result의 dictionary에 들어와서 저장 되었다가, 모든 dictionary인 비동기 함수들이 종료되면, 마지막 callback에 있던 result:dictionary<{}>에서 한번에 통합하여 처리한다.
+            -dictionary라는 점을 신경써줘야 한다.

@@ -9,10 +9,12 @@
   "author": "junehan",
   "license": "ISC",
   "devDependencies": {
+    "@types/async": "^2.4.1",
     "ts-loader": "^5.3.3",
     "typescript": "^3.2.4"
   },
   "dependencies": {
-    "@types/node": "^10.12.18"
+    "@types/node": "^10.12.18",
+    "async": "^2.6.2"
   }
 }
