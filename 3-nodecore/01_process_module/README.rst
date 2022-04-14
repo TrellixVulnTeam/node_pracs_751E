@@ -30,3 +30,27 @@ OUTPUT
       used:       4103888
    }
 
+tick, microTask
+---------------
+
+SYNTAX
+
+   - ``process.nextTick(callback))``
+   - ``queueMicrotask(callback)``
+
+DESC
+
+   ``nextTick``
+
+      nextTick은 현재 컨텍스트(stack)의 진행을 마친 후, 더 이상 sync하게 동작할 operation이 존재하지 않는다면 next tick queue에 쌓인 stack을 진행한다.
+      이 컨텍스트의 전환을 eventloop라고 부르며, 현재 context의 eventloop가 종료되야 다음 이벤트를 향해 이동할 수 있다.
+
+   ``queueMicrotask``
+
+      callback을 호출하도록 queue한다.
+      만약, callback이 exception을 발생시키면, processObject는 uncaughtException 이벤트를 emit하게 될 것이다.
+
+      microtask queue는 V8에 의해 관리되며 nextTick() queue와 비슷하게 동작하는데 그는 Node.js에 의해 관리된다.
+
+      따라서 ``process.nextTick()`` 이 항상 먼저 진행되는데 그것은 nodejs의 eventloop내부의 것이다. microTask의 본 목적은 OS의 기능을 빌림하는 것과 등록하는 것에 있다고 보면 좋다.
+
