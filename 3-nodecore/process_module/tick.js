@@ -16,6 +16,7 @@ function write(d) {
 }
 
 function run_as_async(data, cb) {
+	setTimeout(() => cb(data + " with setTimeout."), 0);
 	process.nextTick(() => cb(data));
 }
 
@@ -30,6 +31,7 @@ main();
 /* OUTPUT
 hi at sync
 hihihi at async
+hihihi at async with setTimeout.
 Process will be exit with exit:  0
 Process exited with code:  0
 */
