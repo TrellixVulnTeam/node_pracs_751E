@@ -7,6 +7,7 @@ process.on("beforeExit", (code) => {
 process.on("exit", (code) => {
 	console.log("Process exited with code: ", code);
 });
+
 /* Your code goes... */
 function write(d) {
 	process.stdout.write("data recevied: "+ d);
@@ -14,15 +15,21 @@ function write(d) {
 	process.stdout.write(`rss: ${rss}, heapsize: ${heapTotal}, used:${heapUsed}`);
 }
 
+function run_as_async(data, cb) {
+	process.nextTick(() => cb(data));
+}
+
 function main() {
-	process.stdin.resume();
-	process.stdin.on("data", write);
+	run_as_async("hihihi at async", console.log);
+	console.log("hi at sync");
 }
 
 main();
 /* Your code ends... */
+
 /* OUTPUT
-sd
-data recevied: sd
-rss: 33198080, heapsize: 4833280, used:4103888
+hi at sync
+hihihi at async
+Process will be exit with exit:  0
+Process exited with code:  0
 */
