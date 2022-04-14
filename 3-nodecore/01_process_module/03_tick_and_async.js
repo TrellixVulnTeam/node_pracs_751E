@@ -9,12 +9,6 @@ process.on("exit", (code) => {
 });
 
 /* Your code goes... */
-function write(d) {
-	process.stdout.write("data recevied: "+ d);
-	const {rss, heapTotal, heapUsed} = process.memoryUsage();
-	process.stdout.write(`rss: ${rss}, heapsize: ${heapTotal}, used:${heapUsed}`);
-}
-
 function run_as_async(data, cb) {
 	setTimeout(() => cb(data + " with setTimeout."), 0);
 	process.nextTick(() => cb(data));
