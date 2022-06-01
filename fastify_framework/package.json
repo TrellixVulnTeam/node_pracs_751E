@@ -1,0 +1,38 @@
+{
+	"name": "fastfy-node-tutorial",
+	"version": "1.0.0",
+	"main": "src/server.js",
+	"scripts": {
+		"start": "npm run format && npm run lint && node src/server.js",
+		"dev": "nodemon src/server.js",
+		"test": "tap --reporter=list --watch",
+		"format": "prettier --write \"src/**/*.js\" \"src/*.js\"",
+		"lint": "eslint \"{src,apps,libs,test}/**/*.js\" --fix",
+		"serve": "nohup node src/server.js"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/junehan-dev/fastfy-node-tutorial.git"
+	},
+	"author": "junehan",
+	"license": "ISC",
+	"bugs": {
+		"url": "https://github.com/junehan-dev/fastfy-node-tutorial/issues"
+	},
+	"homepage": "https://github.com/junehan-dev/fastfy-node-tutorial#readme",
+	"keywords": [],
+	"description": "",
+	"dependencies": {
+		"fastify": "^3.29.0",
+		"fastify-swagger": "^5.2.0",
+		"uuid": "^8.3.2"
+	},
+	"devDependencies": {
+		"eslint": "^8.0.1",
+		"eslint-config-prettier": "^8.3.0",
+		"eslint-plugin-prettier": "^4.0.0",
+		"pino-pretty": "^7.6.1",
+		"prettier": "^2.3.2",
+		"tap": "^16.2.0"
+	}
+}
